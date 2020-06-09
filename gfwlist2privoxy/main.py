@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import pkgutil
-import urlparse
+import urllib.parse
 import logging
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import time
 import re
 from argparse import ArgumentParser
@@ -36,7 +36,7 @@ def decode_gfwlist(content):
     # decode base64 if have to
     try:
         return content.decode('base64')
-    except StandardError:
+    except Exception:
         return content
 
 
@@ -45,7 +45,7 @@ def get_hostname(something):
         # quite enough for GFW
         if not something.startswith('http:'):
             something = 'http://' + something
-        r = urlparse.urlparse(something)
+        r = urllib.parse.urlparse(something)
         return r.hostname
     except Exception as e:
         logging.error(e)
@@ -101,7 +101,7 @@ def reduce_domains(domains):
     for domain in domains:
         domain_parts = domain.split('.')
         last_root_domain = None
-        for i in xrange(0, len(domain_parts)):
+        for i in range(0, len(domain_parts)):
             root_domain = '.'.join(domain_parts[len(domain_parts) - i - 1:])
             if i == 0:
                 if not tlds.__contains__(root_domain):
@@ -158,8 +158,8 @@ def main():
             with open(args.input, 'rb') as f:
                 content = f.read()
     else:
-        print 'Downloading gfwlist from %s' % gfwlist_url
-        content = urllib2.urlopen(gfwlist_url, timeout=10).read()
+        print('Downloading gfwlist from %s' % gfwlist_url)
+        content = urllib.request.urlopen(gfwlist_url, timeout=10).read()
     if args.user_rule:
         with open(args.user_rule, 'rb') as f:
             user_rule = f.read()
